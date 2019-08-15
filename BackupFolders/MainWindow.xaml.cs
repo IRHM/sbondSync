@@ -236,26 +236,22 @@ namespace BackupFolders
                 else
                 {
                     // Is File...
-                    await FileBackup();
+                    string SourceFileDir = s;
+                    string SourceFileName = Path.GetFileName(s);
+                    string SourceFileFolderName = Path.GetFileName(Path.GetDirectoryName(SourceFileDir));
+                    BackupDir = $@"{Properties.Settings.Default.DefaultSaveDir}\{SourceFileFolderName}\{SourceFileName}";
+
+                    string DirToCreate = BackupDir.Replace($@"\{SourceFileName}", "");
+                    Directory.CreateDirectory(DirToCreate);
+
+                    await FileBackup(SourceFileDir, BackupDir);
                 }
             }
         }
 
-        private async Task FileBackup()
+        private async Task FileBackup(string SourceFileDir, string BackupDir)
         {
-            string[] FilePaths = new string[SelectedFilesListBox.Items.Count];
-            FilePaths = SelectedFilesListBox.Items.OfType<string>().ToArray();
-
-            foreach (string s in FilePaths)
-            {
-                string FileName = Path.GetFileName(s);
-                string SourceFolderName = Path.GetFileName(Path.GetDirectoryName(s)); // Name of folder source file is in
-                string DirToCreate = $"{BackupDir}\\{SourceFolderName}"; // Dir to create (if needed)
-                string DestFile = $"{BackupDir}\\{SourceFolderName}\\{FileName}"; // Where the backed up file will end up
-                Directory.CreateDirectory(DirToCreate); // Only creates dir if it doesn't exist
-                await Task.Run(() => File.Copy(s, DestFile, true));
-                File.SetAttributes(DestFile, FileAttributes.Normal);
-            }
+            await Task.Run(() => File.Copy(SourceFileDir, BackupDir, true));
         }
 
         private async Task DirFileBackup(string SourceDir, string BackupDir, bool CopySubDirs)
