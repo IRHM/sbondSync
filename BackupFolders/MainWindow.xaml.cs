@@ -22,8 +22,6 @@ namespace BackupFolders
     {
         string SelectedFileDir;
         string[] files;
-        string[] IsFile;
-        string[] IsFolder;
         string BackupDir;
 
         // Colors
@@ -236,15 +234,15 @@ namespace BackupFolders
                 else
                 {
                     // Is File...
-                    string SourceFileDir = s;
-                    string SourceFileName = Path.GetFileName(s);
-                    string SourceFileFolderName = Path.GetFileName(Path.GetDirectoryName(SourceFileDir));
+                    string SourceFileDir = s; // Directory for source file
+                    string SourceFileName = Path.GetFileName(s); // Name of source file
+                    string SourceFileFolderName = Path.GetFileName(Path.GetDirectoryName(SourceFileDir)); // Folder source files are in
                     BackupDir = $@"{Properties.Settings.Default.DefaultSaveDir}\{SourceFileFolderName}\{SourceFileName}";
 
-                    string DirToCreate = BackupDir.Replace($@"\{SourceFileName}", "");
-                    Directory.CreateDirectory(DirToCreate);
+                    string DirToCreate = BackupDir.Replace($@"\{SourceFileName}", ""); // Remove filename from path
+                    Directory.CreateDirectory(DirToCreate); // Create directory, if needed
 
-                    await FileBackup(SourceFileDir, BackupDir);
+                    await FileBackup(SourceFileDir, BackupDir); // Run method for file copying
                 }
             }
         }
