@@ -72,7 +72,6 @@ namespace BackupFolders
 
         private void SelectFileButton_Click(object sender, RoutedEventArgs e)
         {
-            ProgressBarGrid.Visibility = Visibility.Hidden;
             if (FileCheckBox.IsChecked == true)
             {
                 OpenFileDialog SelectFile = new OpenFileDialog();
@@ -210,6 +209,8 @@ namespace BackupFolders
 
         private async void BackupFilesButton_Click(object sender, RoutedEventArgs e)
         {
+            int FileCount = 0;
+
             // Add Warning - Files Will Be Overwritten!
 
             string[] FilePaths = new string[SelectedFilesListBox.Items.Count];
@@ -217,6 +218,24 @@ namespace BackupFolders
 
             IsDefaultBackupDirAssigned();
 
+            // Sum of how many files are going to be copied
+            foreach (string s in FilePaths)
+            {
+                FileAttributes attr = File.GetAttributes(s);
+
+                if (attr.HasFlag(FileAttributes.Directory))
+                {
+                    FileCount = Directory.GetFiles(s, "*", SearchOption.AllDirectories).Length; // FileCount = How many files in directories
+                }
+                else
+                {
+                    FileCount++; // FileCount = How many files are on their own
+                }
+                // Now, FileCount = How many files are in directories + on their own
+            }
+            ProgressBar.Maximum = FileCount;
+
+            // Organise file copying
             foreach (string s in FilePaths)
             {
                 FileAttributes attr = File.GetAttributes(s);
@@ -250,6 +269,7 @@ namespace BackupFolders
         private async Task FileBackup(string SourceFileDir, string BackupDir)
         {
             await Task.Run(() => File.Copy(SourceFileDir, BackupDir, true));
+            ProgressBar.Value++; // Add 1 to progressbar value once every file copies (when on its own)
         }
 
         private async Task DirFileBackup(string SourceDir, string BackupDir, bool CopySubDirs)
@@ -275,6 +295,7 @@ namespace BackupFolders
                 string TempPath = Path.Combine(BackupDir, file.Name);
                 await Task.Run(() => file.CopyTo(TempPath, true));
                 File.SetAttributes(TempPath, FileAttributes.Normal);
+                ProgressBar.Value++; // Add 1 to progressbar value once every file copies (when in dir)
             }
 
             if (CopySubDirs)
