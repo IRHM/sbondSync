@@ -18,8 +18,6 @@ namespace BackupFolders
 {
     public partial class MainWindow : Window
     {
-        string SelectedFileDir;
-        string[] files;
         public static string BackupDir;
 
         // Colors
@@ -70,42 +68,7 @@ namespace BackupFolders
 
         private void SelectFileButton_Click(object sender, RoutedEventArgs e)
         {
-            if (FileCheckBox.IsChecked == true)
-            {
-                OpenFileDialog SelectFile = new OpenFileDialog();
-
-                SelectFile.Filter = "All files (*.*)|*.*";
-                SelectFile.FilterIndex = 1;
-                SelectFile.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer).ToString();
-                SelectFile.RestoreDirectory = true;
-
-                if (SelectFile.ShowDialog() == true)
-                {
-                    SelectedFileDir = SelectFile.FileName; // Get selected files Directory
-
-                    if (SelectedFileDir != null)
-                    {
-                        FolderDirTextBox.Text = SelectedFileDir;
-                    }
-                    else
-                    {
-                        MessageBox.Show("You need to select a file or folder!");
-                    }
-                }
-            }
-            else if (FolderCheckBox.IsChecked == true)
-            {
-                using (var fbd = new System.Windows.Forms.FolderBrowserDialog())
-                {
-                    System.Windows.Forms.DialogResult result = fbd.ShowDialog();
-
-                    if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
-                    {
-                        files = Directory.GetFiles(fbd.SelectedPath);
-                        FolderDirTextBox.Text = fbd.SelectedPath;
-                    }
-                }
-            }
+            SelectingFilesClass.SelectFiles(FileCheckBox, FolderCheckBox, FolderDirTextBox);
         }
 
         private void AddFilesButton_Click(object sender, RoutedEventArgs e)
