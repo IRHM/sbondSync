@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,14 +16,11 @@ using WPFCustomMessageBox;
 
 namespace BackupFolders
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         string SelectedFileDir;
         string[] files;
-        string BackupDir;
+        public string BackupDir;
 
         // Colors
         byte ErrorA = 255;
@@ -207,7 +205,12 @@ namespace BackupFolders
             return BackupDir;
         }
 
-        private async void BackupFilesButton_Click(object sender, RoutedEventArgs e)
+        private void BackupFilesButton_Click(object sender, RoutedEventArgs e)
+        {
+            StartCopying();
+        }
+
+        public async void StartCopying()
         {
             int FileCount = 0;
 
@@ -248,7 +251,7 @@ namespace BackupFolders
                     BackupDir = $@"{Properties.Settings.Default.DefaultSaveDir}\{SourceDirFolderName}"; //Properties.Settings.Default.DefaultSaveDir
                     bool CopySubDirs = true;
 
-                    await DirFileBackup(SourceDir, BackupDir, CopySubDirs);
+                    await FileCopyingClass.DirFileBackup(ProgressBar, SourceDir, BackupDir, CopySubDirs);
                 }
                 else
                 {
@@ -261,49 +264,7 @@ namespace BackupFolders
                     string DirToCreate = BackupDir.Replace($@"\{SourceFileName}", ""); // Remove filename from path
                     Directory.CreateDirectory(DirToCreate); // Create directory, if needed
 
-                    await FileBackup(SourceFileDir, BackupDir); // Run method for file copying
-                }
-            }
-        }
-
-        private async Task FileBackup(string SourceFileDir, string BackupDir)
-        {
-            await Task.Run(() => File.Copy(SourceFileDir, BackupDir, true));
-            ProgressBar.Value++; // Add 1 to progressbar value once every file copies (when on its own)
-        }
-
-        private async Task DirFileBackup(string SourceDir, string BackupDir, bool CopySubDirs)
-        {
-            DirectoryInfo dir = new DirectoryInfo(SourceDir);
-
-            if (!dir.Exists)
-            {
-                throw new DirectoryNotFoundException(
-                    $"{SourceDir} - Could not be found.");
-            }
-
-            DirectoryInfo[] dirs = dir.GetDirectories();
-            // If the destination directory doesn't exist, create it.
-            if (!Directory.Exists(BackupDir))
-            {
-                Directory.CreateDirectory(BackupDir);
-            }
-
-            FileInfo[] files = dir.GetFiles();
-            foreach (FileInfo file in files)
-            {
-                string TempPath = Path.Combine(BackupDir, file.Name);
-                await Task.Run(() => file.CopyTo(TempPath, true));
-                File.SetAttributes(TempPath, FileAttributes.Normal);
-                ProgressBar.Value++; // Add 1 to progressbar value once every file copies (when in dir)
-            }
-
-            if (CopySubDirs)
-            {
-                foreach (DirectoryInfo subdir in dirs)
-                {
-                    string temppath = Path.Combine(BackupDir, subdir.Name);
-                    await DirFileBackup(subdir.FullName, temppath, CopySubDirs);
+                    await FileCopyingClass.FileBackup(ProgressBar, SourceFileDir, BackupDir); // Run method for file copying
                 }
             }
         }

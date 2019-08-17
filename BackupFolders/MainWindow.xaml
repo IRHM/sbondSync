@@ -59,7 +59,8 @@
             <TextBlock Margin="0 10 0 0" 
                        FontWeight="Bold">Selected Files:</TextBlock>
             <ListBox x:Name="SelectedFilesListBox" Height="200" 
-                     SelectionMode="Extended"></ListBox>
+                     SelectionMode="Extended"
+                     x:FieldModifier="public"></ListBox>
 
 
             <Grid Margin="0 10 0 0">
@@ -98,10 +99,12 @@
                              Minimum="0" 
                              Maximum="100" 
                              Value="0"
-                             Height="24" Foreground="#FF62FF7F"/>  
+                             Height="24" Foreground="#FF62FF7F"
+                             x:FieldModifier="public"/>  
                 <TextBlock x:Name="ProgressBarTextBlock"
                            HorizontalAlignment="Center" 
-                           VerticalAlignment="Center"/>
+                           VerticalAlignment="Center"
+                           x:FieldModifier="public"/>
             </Grid>
             
             <TextBlock x:Name="NoticeTextBlock" 
