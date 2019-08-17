@@ -27,9 +27,9 @@ namespace BackupFolders
         public static byte ErrorB = 39;
 
         byte SuccessA = 255;
-        byte SuccessR = 95;
-        byte SuccessG = 186;
-        byte SuccessB = 125;
+        byte SuccessR = 98;
+        byte SuccessG = 255;
+        byte SuccessB = 127;
 
         public MainWindow()
         {
@@ -64,6 +64,13 @@ namespace BackupFolders
             NoticeTextBlock.Foreground = new SolidColorBrush(Color.FromArgb(A, R, G, B));
             NoticeTextBlock.Cursor = Cursors.Hand;
             NoticeTextBlock.Opacity = 100;
+        }
+
+        public void ResetProgressBar()
+        {
+            ProgressBar.Value = 0;
+            ProgressBar.Foreground = new SolidColorBrush(Color.FromArgb(SuccessA, SuccessR, SuccessG, SuccessB));
+            ProgressBarTextBlock.Text = "";
         }
 
         private void SelectFileButton_Click(object sender, RoutedEventArgs e)
@@ -170,6 +177,7 @@ namespace BackupFolders
 
         private void BackupFilesButton_Click(object sender, RoutedEventArgs e)
         {
+            ResetProgressBar();
             FileCopyingClass.StartCopying(SelectedFilesListBox, ProgressBar, ProgressBarTextBlock);
         }
     }
