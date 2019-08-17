@@ -104,7 +104,7 @@
                 <TextBlock x:Name="ProgressBarTextBlock"
                            HorizontalAlignment="Center" 
                            VerticalAlignment="Center"
-                           x:FieldModifier="public"/>
+                           x:FieldModifier="public" FontWeight="Bold"/>
             </Grid>
             
             <TextBlock x:Name="NoticeTextBlock" 

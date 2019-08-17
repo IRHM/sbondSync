@@ -5,12 +5,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace BackupFolders
 {
     public class FileCopyingClass
     {
-        public static async void StartCopying(ListBox SelectedFilesListBox, ProgressBar ProgressBar)
+        // Colours
+        static byte ErrorA = 255;
+        static byte ErrorR = 225;
+        static byte ErrorG = 0;
+        static byte ErrorB = 0;
+
+        // Errors
+        static string FileNotFoundExceptionError = "File Not Found";
+        static string UnauthorizedAccessExceptionError = "Insufficient Permissions";
+        static string ArgumentExceptionError = "File Has An Invalid Name";
+        static string PathTooLongExceptionError = "File Path Exceed Maximum Length";
+        static string DirectoryNotFoundExceptionError = "Path Does Not Exist";
+        static string NotSupportedExceptionError = "File Is In Invalid Format";
+
+        public static async void StartCopying(ListBox SelectedFilesListBox, ProgressBar ProgressBar, TextBlock ProgressBarTextBlock)
         {
             int FileCount = 0;
 
@@ -21,61 +36,95 @@ namespace BackupFolders
 
             MainWindow.IsDefaultBackupDirAssigned();
 
-            // Sum of how many files are going to be copied
-            foreach (string s in FilePaths)
+            try
             {
-                FileAttributes attr = File.GetAttributes(s);
+                // Sum of how many files are going to be copied
+                foreach (string s in FilePaths)
+                {
+                    FileAttributes attr = File.GetAttributes(s);
 
-                if (attr.HasFlag(FileAttributes.Directory))
-                {
-                    FileCount = Directory.GetFiles(s, "*", SearchOption.AllDirectories).Length; // FileCount = How many files in directories
+                    if (attr.HasFlag(FileAttributes.Directory))
+                    {
+                        FileCount = Directory.GetFiles(s, "*", SearchOption.AllDirectories).Length; // FileCount = How many files in directories
+                    }
+                    else
+                    {
+                        FileCount++; // FileCount = How many files are on their own
+                    }
+                    // Now, FileCount = How many files are in directories + on their own
                 }
-                else
+                ProgressBar.Maximum = FileCount;
+
+                // Organise file copying
+                foreach (string s in FilePaths)
                 {
-                    FileCount++; // FileCount = How many files are on their own
+                    FileAttributes attr = File.GetAttributes(s);
+
+                    if (attr.HasFlag(FileAttributes.Directory))
+                    {
+                        // Is Directory...
+                        string SourceDir = s; // Directory for source files
+                        string SourceDirFolderName = new DirectoryInfo(s).Name; // Folder source files are in
+                        MainWindow.BackupDir = $@"{Properties.Settings.Default.DefaultSaveDir}\{SourceDirFolderName}";
+                        bool CopySubDirs = true;
+
+                        await FileCopyingClass.DirFileBackup(ProgressBar, ProgressBarTextBlock, SourceDir, MainWindow.BackupDir, CopySubDirs);
+                    }
+                    else
+                    {
+                        // Is File...
+                        string SourceFileDir = s; // Directory for source file
+                        string SourceFileName = Path.GetFileName(s); // Name of source file
+                        string SourceFileFolderName = Path.GetFileName(Path.GetDirectoryName(SourceFileDir)); // Folder source files are in
+                        MainWindow.BackupDir = $@"{Properties.Settings.Default.DefaultSaveDir}\{SourceFileFolderName}\{SourceFileName}";
+
+                        string DirToCreate = MainWindow.BackupDir.Replace($@"\{SourceFileName}", ""); // Remove filename from path
+                        Directory.CreateDirectory(DirToCreate); // Create directory, if needed
+
+                        await FileCopyingClass.FileBackup(ProgressBar, SourceFileDir, MainWindow.BackupDir); // Run method for file copying
+                    }
                 }
-                // Now, FileCount = How many files are in directories + on their own
             }
-            ProgressBar.Maximum = FileCount;
-
-            // Organise file copying
-            foreach (string s in FilePaths)
+            catch (UnauthorizedAccessException)
             {
-                FileAttributes attr = File.GetAttributes(s);
-
-                if (attr.HasFlag(FileAttributes.Directory))
-                {
-                    // Is Directory...
-                    string SourceDir = s; // Directory for source files
-                    string SourceDirFolderName = new DirectoryInfo(s).Name; // Folder source files are in
-                    MainWindow.BackupDir = $@"{Properties.Settings.Default.DefaultSaveDir}\{SourceDirFolderName}"; //Properties.Settings.Default.DefaultSaveDir
-                    bool CopySubDirs = true;
-
-                    await FileCopyingClass.DirFileBackup(ProgressBar, SourceDir, MainWindow.BackupDir, CopySubDirs);
-                }
-                else
-                {
-                    // Is File...
-                    string SourceFileDir = s; // Directory for source file
-                    string SourceFileName = Path.GetFileName(s); // Name of source file
-                    string SourceFileFolderName = Path.GetFileName(Path.GetDirectoryName(SourceFileDir)); // Folder source files are in
-                    MainWindow.BackupDir = $@"{Properties.Settings.Default.DefaultSaveDir}\{SourceFileFolderName}\{SourceFileName}";
-
-                    string DirToCreate = MainWindow.BackupDir.Replace($@"\{SourceFileName}", ""); // Remove filename from path
-                    Directory.CreateDirectory(DirToCreate); // Create directory, if needed
-
-                    await FileCopyingClass.FileBackup(ProgressBar, SourceFileDir, MainWindow.BackupDir); // Run method for file copying
-                }
+                FileCopyError(ProgressBar, ProgressBarTextBlock, UnauthorizedAccessExceptionError,
+                                ErrorA, ErrorR, ErrorG, ErrorB);
+            }
+            catch (ArgumentException)
+            {
+                FileCopyError(ProgressBar, ProgressBarTextBlock, ArgumentExceptionError,
+                                ErrorA, ErrorR, ErrorG, ErrorB);
+            }
+            catch (PathTooLongException)
+            {
+                FileCopyError(ProgressBar, ProgressBarTextBlock, PathTooLongExceptionError,
+                                ErrorA, ErrorR, ErrorG, ErrorB);
+            }
+            catch (DirectoryNotFoundException)
+            {
+                FileCopyError(ProgressBar, ProgressBarTextBlock, DirectoryNotFoundExceptionError,
+                                ErrorA, ErrorR, ErrorG, ErrorB);
+            }
+            catch (FileNotFoundException)
+            {
+                FileCopyError(ProgressBar, ProgressBarTextBlock, FileNotFoundExceptionError,
+                                ErrorA, ErrorR, ErrorG, ErrorB);
+            }
+            catch (NotSupportedException)
+            {
+                FileCopyError(ProgressBar, ProgressBarTextBlock, NotSupportedExceptionError,
+                                ErrorA, ErrorR, ErrorG, ErrorB);
             }
         }
 
-        public static async Task FileBackup(ProgressBar ProgBar, string SourceFileDir, string BackupDir)
+        public static async Task FileBackup(ProgressBar ProgressBar, string SourceFileDir, string BackupDir)
         {
             await Task.Run(() => File.Copy(SourceFileDir, BackupDir, true));
-            ProgBar.Value++; // Add 1 to progressbar value once every file copies (when on its own)
+            ProgressBar.Value++; // Add 1 to progressbar value once every file copies (when on its own)
         }
 
-        public static async Task DirFileBackup(ProgressBar ProgBar, string SourceDir, string BackupDir, bool CopySubDirs)
+        public static async Task DirFileBackup(ProgressBar ProgressBar, TextBlock ProgressBarTextBlock, 
+                                                string SourceDir, string BackupDir, bool CopySubDirs)
         {
             DirectoryInfo dir = new DirectoryInfo(SourceDir);
 
@@ -96,9 +145,19 @@ namespace BackupFolders
             foreach (FileInfo file in files)
             {
                 string TempPath = Path.Combine(BackupDir, file.Name);
-                await Task.Run(() => file.CopyTo(TempPath, true));
+
+                try
+                {
+                    await Task.Run(() => file.CopyTo(TempPath, true));
+                }
+                catch(FileNotFoundException FileNotFoundException)
+                {
+                    FileCopyError(ProgressBar, ProgressBarTextBlock, FileNotFoundException.ToString(), 
+                                    MainWindow.ErrorA, MainWindow.ErrorR, MainWindow.ErrorG, MainWindow.ErrorB);
+                }
+
                 File.SetAttributes(TempPath, FileAttributes.Normal);
-                ProgBar.Value++; // Add 1 to progressbar value once every file copies (when in dir)
+                ProgressBar.Value++; // Add 1 to progressbar value once every file copies (when in dir)
             }
 
             if (CopySubDirs)
@@ -106,9 +165,16 @@ namespace BackupFolders
                 foreach (DirectoryInfo subdir in dirs)
                 {
                     string temppath = Path.Combine(BackupDir, subdir.Name);
-                    await DirFileBackup(ProgBar, subdir.FullName, temppath, CopySubDirs);
+                    await DirFileBackup(ProgressBar, ProgressBarTextBlock, subdir.FullName, temppath, CopySubDirs);
                 }
             }
+        }
+
+        public static void FileCopyError(ProgressBar ProgressBar, TextBlock ProgressBarTextBlock, string Error, byte A, byte R, byte G, byte B)
+        {
+            ProgressBar.Value = ProgressBar.Maximum;
+            ProgressBar.Foreground = new SolidColorBrush(Color.FromArgb(A, R, G, B));
+            ProgressBarTextBlock.Text = Error;
         }
     }
 }

@@ -21,10 +21,10 @@ namespace BackupFolders
         public static string BackupDir;
 
         // Colors
-        byte ErrorA = 255;
-        byte ErrorR = 125;
-        byte ErrorG = 39;
-        byte ErrorB = 39;
+        public static byte ErrorA = 255;
+        public static byte ErrorR = 125;
+        public static byte ErrorG = 39;
+        public static byte ErrorB = 39;
 
         byte SuccessA = 255;
         byte SuccessR = 95;
@@ -170,7 +170,7 @@ namespace BackupFolders
 
         private void BackupFilesButton_Click(object sender, RoutedEventArgs e)
         {
-            FileCopyingClass.StartCopying(SelectedFilesListBox, ProgressBar);
+            FileCopyingClass.StartCopying(SelectedFilesListBox, ProgressBar, ProgressBarTextBlock);
         }
     }
 }
