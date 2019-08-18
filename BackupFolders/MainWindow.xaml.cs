@@ -142,12 +142,12 @@ namespace BackupFolders
                 BackupDir = Properties.Settings.Default.DefaultSaveDir;
 
                 MessageBoxResult result = CustomMessageBox.ShowYesNoCancel(
-                                        $"Backup to: '{BackupDir}' ?",
-                                        "Backup Directory",
-                                        "Yes",
-                                        "Change Backup Dir",
-                                        "Cancel",
-                                        MessageBoxImage.Question);
+                    $"Backup to: '{BackupDir}' ?",
+                    "Backup Directory",
+                    "Yes",
+                    "Change Backup Dir",
+                    "Cancel",
+                    MessageBoxImage.Question);
 
                 switch (result)
                 {
@@ -156,11 +156,9 @@ namespace BackupFolders
                         break;
                     case MessageBoxResult.No:
                         BackupDirMessageBoxResponse = "Change Backup Dir";
-                        // SelectBackupDir();
                         break;
                     case MessageBoxResult.Cancel:
                         BackupDirMessageBoxResponse = "Cancel";
-                        // FileCopyingClass.FileCopyError(ProgressBar, ProgressBarTextBlock, "Operation Canceled", ErrorA, ErrorR, ErrorG, ErrorB);
                         break;
                 }
             }
@@ -194,10 +192,18 @@ namespace BackupFolders
         private void BackupFilesButton_Click(object sender, RoutedEventArgs e)
         {
             IsDefaultBackupDirAssigned();
+
             if (BackupDirMessageBoxResponse == "Yes")
             {
-                ResetProgressBar();
-                FileCopyingClass.StartCopying(SelectedFilesListBox, ProgressBar, ProgressBarTextBlock);
+                if(SelectedFilesListBox.Items.Count != 0)
+                {
+                    ResetProgressBar();
+                    FileCopyingClass.StartCopying(SelectedFilesListBox, ProgressBar, ProgressBarTextBlock);
+                }
+                else
+                {
+                    FileCopyingClass.FileCopyNotice(ProgressBar, ProgressBarTextBlock, "No Files Selected", ErrorA, ErrorR, ErrorG, ErrorB);
+                }
             }
             else if (BackupDirMessageBoxResponse == "Change Backup Dir")
             {
@@ -205,7 +211,7 @@ namespace BackupFolders
             }
             else if (BackupDirMessageBoxResponse == "Cancel")
             {
-
+                FileCopyingClass.FileCopyNotice(ProgressBar, ProgressBarTextBlock, "Operation Cancelled", ErrorA, ErrorR, ErrorG, ErrorB);
             }
         }
     }

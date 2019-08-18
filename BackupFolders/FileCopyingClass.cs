@@ -20,6 +20,11 @@ namespace BackupFolders
         static byte ErrorG = 0;
         static byte ErrorB = 0;
 
+        static byte SuccessA = 255;
+        static byte SuccessR = 98;
+        static byte SuccessG = 255;
+        static byte SuccessB = 127;
+
         // Errors
         static string FileNotFoundExceptionError = "File Not Found";
         static string UnauthorizedAccessExceptionError = "Insufficient Permissions";
@@ -39,6 +44,8 @@ namespace BackupFolders
 
             try
             {
+
+
                 // Sum of how many files are going to be copied
                 foreach (string s in FilePaths)
                 {
@@ -90,45 +97,45 @@ namespace BackupFolders
 
                 if (ProgressBar.Value == ProgressBar.Maximum)
                 {
-                    FileCopyNotice(ProgressBarTextBlock, $"Done Copying All Files");
+                    FileCopyStatus(ProgressBar, ProgressBarTextBlock, $"Done Copying All Files", SuccessA, SuccessR, SuccessG, SuccessB);
                 }
                 else { }
             }
             catch (UnauthorizedAccessException)
             {
-                FileCopyError(ProgressBar, ProgressBarTextBlock, UnauthorizedAccessExceptionError,
+                FileCopyNotice(ProgressBar, ProgressBarTextBlock, UnauthorizedAccessExceptionError,
                                 ErrorA, ErrorR, ErrorG, ErrorB);
             }
             catch (ArgumentException)
             {
-                FileCopyError(ProgressBar, ProgressBarTextBlock, ArgumentExceptionError,
+                FileCopyNotice(ProgressBar, ProgressBarTextBlock, ArgumentExceptionError,
                                 ErrorA, ErrorR, ErrorG, ErrorB);
             }
             catch (PathTooLongException)
             {
-                FileCopyError(ProgressBar, ProgressBarTextBlock, PathTooLongExceptionError,
+                FileCopyNotice(ProgressBar, ProgressBarTextBlock, PathTooLongExceptionError,
                                 ErrorA, ErrorR, ErrorG, ErrorB);
             }
             catch (DirectoryNotFoundException)
             {
-                FileCopyError(ProgressBar, ProgressBarTextBlock, DirectoryNotFoundExceptionError,
+                FileCopyNotice(ProgressBar, ProgressBarTextBlock, DirectoryNotFoundExceptionError,
                                 ErrorA, ErrorR, ErrorG, ErrorB);
             }
             catch (FileNotFoundException)
             {
-                FileCopyError(ProgressBar, ProgressBarTextBlock, FileNotFoundExceptionError,
+                FileCopyNotice(ProgressBar, ProgressBarTextBlock, FileNotFoundExceptionError,
                                 ErrorA, ErrorR, ErrorG, ErrorB);
             }
             catch (NotSupportedException)
             {
-                FileCopyError(ProgressBar, ProgressBarTextBlock, NotSupportedExceptionError,
+                FileCopyNotice(ProgressBar, ProgressBarTextBlock, NotSupportedExceptionError,
                                 ErrorA, ErrorR, ErrorG, ErrorB);
             }
         }
 
         public static async Task FileBackup(ProgressBar ProgressBar, TextBlock ProgressBarTextBlock, string SourceFileDir, string BackupDir)
         {
-            FileCopyNotice(ProgressBarTextBlock, $"Copying {SourceFileName}");
+            FileCopyStatus(ProgressBar, ProgressBarTextBlock, $"Copying {SourceFileName}", SuccessA, SuccessR, SuccessG, SuccessB);
             await Task.Run(() => File.Copy(SourceFileDir, BackupDir, true));
             ProgressBar.Value++; // Add 1 to progressbar value once every file copies (when on its own)
         }
@@ -154,7 +161,7 @@ namespace BackupFolders
             FileInfo[] Files = Dir.GetFiles();
             foreach (FileInfo f in Files)
             {
-                FileCopyNotice(ProgressBarTextBlock, $"Copying {f.Name}");
+                FileCopyStatus(ProgressBar, ProgressBarTextBlock, $"Copying {f.Name}", SuccessA, SuccessR, SuccessG, SuccessB);
                 string TempPath = Path.Combine(BackupDir, f.Name);
                 await Task.Run(() => f.CopyTo(TempPath, true));
                 File.SetAttributes(TempPath, FileAttributes.Normal);
@@ -171,16 +178,18 @@ namespace BackupFolders
             }
         }
 
-        public static void FileCopyError(ProgressBar ProgressBar, TextBlock ProgressBarTextBlock, string Error, byte A, byte R, byte G, byte B)
+        public static void FileCopyNotice(ProgressBar ProgressBar, TextBlock ProgressBarTextBlock, string Error, byte A, byte R, byte G, byte B)
         {
-            ProgressBar.Value = ProgressBar.Maximum;
-            ProgressBar.Foreground = new SolidColorBrush(Color.FromArgb(A, R, G, B));
-            ProgressBarTextBlock.Text = Error;
+            ProgressBar.Visibility = Visibility.Visible; // Make ProgressBar Visible
+            ProgressBar.Value = ProgressBar.Maximum; // Set ProgressBar Value To Max
+            ProgressBar.Foreground = new SolidColorBrush(Color.FromArgb(A, R, G, B)); // Set ProgressBar Foreground Colour
+            ProgressBarTextBlock.Text = Error; // Add text to ProgressBarTextBlock
         }
 
-        public static void FileCopyNotice(TextBlock ProgressBarTextBlock, string Notice)
+        public static void FileCopyStatus(ProgressBar ProgressBar, TextBlock ProgressBarTextBlock, string Status, byte A, byte R, byte G, byte B)
         {
-            ProgressBarTextBlock.Text = Notice;
+            ProgressBar.Foreground = new SolidColorBrush(Color.FromArgb(A, R, G, B)); // Set ProgressBar Foreground Colour
+            ProgressBarTextBlock.Text = Status;
         }
     }
 }

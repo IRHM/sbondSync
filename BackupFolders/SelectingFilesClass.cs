@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using WPFCustomMessageBox;
 
 namespace BackupFolders
 {
@@ -10,6 +11,12 @@ namespace BackupFolders
     {
         static string[] files;
         static string SelectedFileDir;
+
+        // Colours
+        static byte ErrorA = 255;
+        static byte ErrorR = 225;
+        static byte ErrorG = 0;
+        static byte ErrorB = 0;
 
         public static void SelectFiles(CheckBox FileCheckBox, CheckBox FolderCheckBox, TextBox FolderDirTextBox)
         {
@@ -48,6 +55,10 @@ namespace BackupFolders
                         FolderDirTextBox.Text = fbd.SelectedPath;
                     }
                 }
+            }
+            else
+            {
+                CustomMessageBox.Show("Please check either the folder or file check box.");
             }
         }
     }
