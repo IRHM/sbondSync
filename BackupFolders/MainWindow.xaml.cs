@@ -68,6 +68,7 @@ namespace BackupFolders
 
         public void ResetProgressBar()
         {
+            ProgressBar.Visibility = Visibility.Hidden;
             ProgressBar.Value = 0;
             ProgressBar.Foreground = new SolidColorBrush(Color.FromArgb(SuccessA, SuccessR, SuccessG, SuccessB));
             ProgressBarTextBlock.Text = "";
@@ -75,11 +76,13 @@ namespace BackupFolders
 
         private void SelectFileButton_Click(object sender, RoutedEventArgs e)
         {
+            ResetProgressBar();
             SelectingFilesClass.SelectFiles(FileCheckBox, FolderCheckBox, FolderDirTextBox);
         }
 
         private void AddFilesButton_Click(object sender, RoutedEventArgs e)
         {
+            ResetProgressBar();
             if (FileCheckBox.IsChecked == true)
             {
                 if (!SelectedFilesListBox.Items.Contains(FolderDirTextBox.Text))

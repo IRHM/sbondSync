@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -56,7 +57,7 @@ namespace BackupFolders
                     // Now, FileCount = How many files are in directories + on their own
                 }
                 ProgressBar.Maximum = FileCount;
-
+                ProgressBar.Visibility = Visibility.Visible;
                 // Organise file copying
                 foreach (string s in FilePaths)
                 {
