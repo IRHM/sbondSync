@@ -135,21 +135,32 @@ namespace BackupFolders
             ShouldBackupFilesButtonBePlural();
         }
 
-        public static string IsDefaultBackupDirAssigned()
+        public string IsDefaultBackupDirAssigned()
         {
             if (Properties.Settings.Default.DefaultSaveDir != "")
             {
                 BackupDir = Properties.Settings.Default.DefaultSaveDir;
-                MessageBoxResult result = CustomMessageBox.Show($"Backup to: '{BackupDir}' ?", "Backup Directory",
-                    MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                MessageBoxResult result = CustomMessageBox.ShowYesNoCancel(
+                                        $"Backup to: '{BackupDir}' ?",
+                                        "Backup Directory",
+                                        "Yes",
+                                        "Change Backup Dir",
+                                        "Cancel",
+                                        MessageBoxImage.Question);
 
                 switch (result)
                 {
                     case MessageBoxResult.Yes:
-                        // CustomMessageBox.Show("Yes");
+                        BackupDirMessageBoxResponse = "Yes";
                         break;
                     case MessageBoxResult.No:
-                        SelectBackupDir();
+                        BackupDirMessageBoxResponse = "Change Backup Dir";
+                        // SelectBackupDir();
+                        break;
+                    case MessageBoxResult.Cancel:
+                        BackupDirMessageBoxResponse = "Cancel";
+                        // FileCopyingClass.FileCopyError(ProgressBar, ProgressBarTextBlock, "Operation Canceled", ErrorA, ErrorR, ErrorG, ErrorB);
                         break;
                 }
             }
@@ -161,6 +172,8 @@ namespace BackupFolders
             }
             return BackupDir;
         }
+
+        string BackupDirMessageBoxResponse;
 
         public static string SelectBackupDir()
         {
@@ -180,8 +193,20 @@ namespace BackupFolders
 
         private void BackupFilesButton_Click(object sender, RoutedEventArgs e)
         {
-            ResetProgressBar();
-            FileCopyingClass.StartCopying(SelectedFilesListBox, ProgressBar, ProgressBarTextBlock);
+            IsDefaultBackupDirAssigned();
+            if (BackupDirMessageBoxResponse == "Yes")
+            {
+                ResetProgressBar();
+                FileCopyingClass.StartCopying(SelectedFilesListBox, ProgressBar, ProgressBarTextBlock);
+            }
+            else if (BackupDirMessageBoxResponse == "Change Backup Dir")
+            {
+                SelectBackupDir();
+            }
+            else if (BackupDirMessageBoxResponse == "Cancel")
+            {
+
+            }
         }
     }
 }

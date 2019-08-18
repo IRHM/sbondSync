@@ -37,8 +37,6 @@ namespace BackupFolders
             string[] FilePaths = new string[SelectedFilesListBox.Items.Count];
             FilePaths = SelectedFilesListBox.Items.OfType<string>().ToArray();
 
-            MainWindow.IsDefaultBackupDirAssigned();
-
             try
             {
                 // Sum of how many files are going to be copied
@@ -88,9 +86,13 @@ namespace BackupFolders
 
                         await FileCopyingClass.FileBackup(ProgressBar, ProgressBarTextBlock, SourceFileDir, MainWindow.BackupDir); // Run method for file copying
                     }
+                }
 
+                if (ProgressBar.Value == ProgressBar.Maximum)
+                {
                     FileCopyNotice(ProgressBarTextBlock, $"Done Copying All Files");
                 }
+                else { }
             }
             catch (UnauthorizedAccessException)
             {
