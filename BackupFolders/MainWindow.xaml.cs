@@ -19,6 +19,7 @@ namespace BackupFolders
     public partial class MainWindow : Window
     {
         public static string BackupDir;
+        
 
         // Colors
         public static byte ErrorA = 255;
@@ -83,28 +84,16 @@ namespace BackupFolders
         private void AddFilesButton_Click(object sender, RoutedEventArgs e)
         {
             ResetProgressBar();
-            if (FileCheckBox.IsChecked == true)
+
+            if (SelectedFilesListBox.Items.Contains(FolderDirTextBox.Text) || FolderDirTextBox.Text == "")
             {
-                if (!SelectedFilesListBox.Items.Contains(FolderDirTextBox.Text))
-                {
-                    SelectedFilesListBox.Items.Add(FolderDirTextBox.Text);
-                }
-                else
-                {
-                    Notice("Error: File(s) already added.", ErrorA, ErrorR, ErrorG, ErrorB);
-                }
+                Notice("Error: Duplicate File or Nothing Selected.", ErrorA, ErrorR, ErrorG, ErrorB);
             }
-            else if (FolderCheckBox.IsChecked == true)
+            else
             {
-                if (!SelectedFilesListBox.Items.Contains(FolderDirTextBox.Text))
-                {
-                    SelectedFilesListBox.Items.Add(FolderDirTextBox.Text);
-                }
-                else
-                {
-                    Notice("Error: File(s) already added.", ErrorA, ErrorR, ErrorG, ErrorB);
-                }
+                SelectedFilesListBox.Items.Add(FolderDirTextBox.Text);
             }
+
             ShouldBackupFilesButtonBePlural();
         }
 
@@ -198,7 +187,7 @@ namespace BackupFolders
                 if(SelectedFilesListBox.Items.Count != 0)
                 {
                     ResetProgressBar();
-                    FileCopyingClass.StartCopying(SelectedFilesListBox, ProgressBar, ProgressBarTextBlock);
+                    FileCopyingClass.StartCopying(SelectedFilesListBox, ProgressBar, ProgressBarTextBlock, ElapsedTimeTextBlock);
                 }
                 else
                 {

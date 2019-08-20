@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -7,12 +8,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace BackupFolders
 {
     public class FileCopyingClass
     {
         static string SourceFileName;
+
 
         // Colours
         static byte ErrorA = 255;
@@ -32,8 +35,9 @@ namespace BackupFolders
         static string PathTooLongExceptionError = "File Path Exceed Maximum Length";
         static string DirectoryNotFoundExceptionError = "Path Does Not Exist";
         static string NotSupportedExceptionError = "File Is In Invalid Format";
-
-        public static async void StartCopying(ListBox SelectedFilesListBox, ProgressBar ProgressBar, TextBlock ProgressBarTextBlock)
+      
+        public static async void StartCopying(ListBox SelectedFilesListBox, ProgressBar ProgressBar, 
+                                              TextBlock ProgressBarTextBlock, TextBlock ElapsedTimeTextBlock)
         {
             int FileCount = 0;
 
@@ -44,8 +48,6 @@ namespace BackupFolders
 
             try
             {
-
-
                 // Sum of how many files are going to be copied
                 foreach (string s in FilePaths)
                 {
@@ -141,7 +143,7 @@ namespace BackupFolders
         }
 
         public static async Task DirFileBackup(ProgressBar ProgressBar, TextBlock ProgressBarTextBlock, 
-                                                string SourceDir, string BackupDir, bool CopySubDirs)
+                                               string SourceDir, string BackupDir, bool CopySubDirs)
         {
             DirectoryInfo Dir = new DirectoryInfo(SourceDir);
 

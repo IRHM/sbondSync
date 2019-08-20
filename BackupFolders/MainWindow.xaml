@@ -107,7 +107,22 @@
                            VerticalAlignment="Center"
                            x:FieldModifier="public" FontWeight="Bold"/>
             </Grid>
-            
+
+            <Grid Margin="0 5 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock x:Name="ElapsedTimeTextBlock"
+                           Grid.Column="3"
+                           FontWeight="Bold"
+                           TextAlignment="Right"
+                           x:FieldModifier="public"/>
+            </Grid>
+
             <TextBlock x:Name="NoticeTextBlock" 
                        MouseUp="NoticeTextBlock_MouseUp"
                        Margin="0 20 0 0"
