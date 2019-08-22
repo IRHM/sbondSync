@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,7 +16,6 @@ namespace BackupFolders
     public class FileCopyingClass
     {
         static string SourceFileName;
-
 
         // Colours
         static byte ErrorA = 255;
@@ -35,7 +35,28 @@ namespace BackupFolders
         static string PathTooLongExceptionError = "File Path Exceed Maximum Length";
         static string DirectoryNotFoundExceptionError = "Path Does Not Exist";
         static string NotSupportedExceptionError = "File Is In Invalid Format";
-      
+
+        public static void ElapsedTime(TextBlock ElapsedTimeTextBlock)
+        {
+            while (true)
+            {
+                Stopwatch ElapsedTimeStopwatch = new Stopwatch();
+                ElapsedTimeStopwatch.Start();
+                // ElapsedTimeStopwatch.Stop();
+                TimeSpan ts = ElapsedTimeStopwatch.Elapsed;
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                    ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                // ElapsedTimeTextBlock.Text = elapsedTime;
+                MessageBox.Show(elapsedTime);
+            }
+        }
+
+        public static void StartElapsedTime(TextBlock ElapsedTimeTextBlock)
+        {
+            Thread ElapsedTimeThread = new Thread(() => ElapsedTime(ElapsedTimeTextBlock));
+            ElapsedTimeThread.Start();
+        }
+
         public static async void StartCopying(ListBox SelectedFilesListBox, ProgressBar ProgressBar, 
                                               TextBlock ProgressBarTextBlock, TextBlock ElapsedTimeTextBlock)
         {
@@ -80,7 +101,7 @@ namespace BackupFolders
                         MainWindow.BackupDir = $@"{Properties.Settings.Default.DefaultSaveDir}\{SourceDirFolderName}";
                         bool CopySubDirs = true;
 
-                        await FileCopyingClass.DirFileBackup(ProgressBar, ProgressBarTextBlock, SourceDir, MainWindow.BackupDir, CopySubDirs);
+                        await DirFileBackup(ProgressBar, ProgressBarTextBlock, SourceDir, MainWindow.BackupDir, CopySubDirs);
                     }
                     else
                     {
@@ -93,7 +114,7 @@ namespace BackupFolders
                         string DirToCreate = MainWindow.BackupDir.Replace($@"\{SourceFileName}", ""); // Remove filename from path of BackupDir
                         Directory.CreateDirectory(DirToCreate); // Create directory, if needed
 
-                        await FileCopyingClass.FileBackup(ProgressBar, ProgressBarTextBlock, SourceFileDir, MainWindow.BackupDir); // Run method for file copying
+                        await FileBackup(ProgressBar, ProgressBarTextBlock, SourceFileDir, MainWindow.BackupDir); // Run method for file copying
                     }
                 }
 

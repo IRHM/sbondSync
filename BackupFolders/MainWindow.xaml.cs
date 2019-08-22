@@ -39,7 +39,7 @@ namespace BackupFolders
 
         private void BackupWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void FileCheckBox_Click(object sender, RoutedEventArgs e)
@@ -188,6 +188,7 @@ namespace BackupFolders
                 {
                     ResetProgressBar();
                     FileCopyingClass.StartCopying(SelectedFilesListBox, ProgressBar, ProgressBarTextBlock, ElapsedTimeTextBlock);
+                    FileCopyingClass.StartElapsedTime(ElapsedTimeTextBlock);
                 }
                 else
                 {
