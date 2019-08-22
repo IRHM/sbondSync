@@ -38,16 +38,18 @@ namespace BackupFolders
 
         public static void ElapsedTime(TextBlock ElapsedTimeTextBlock)
         {
+            Stopwatch ElapsedTimeStopwatch = new Stopwatch();
+            ElapsedTimeStopwatch.Start();
             while (true)
             {
-                Stopwatch ElapsedTimeStopwatch = new Stopwatch();
-                ElapsedTimeStopwatch.Start();
-                // ElapsedTimeStopwatch.Stop();
-                TimeSpan ts = ElapsedTimeStopwatch.Elapsed;
-                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                    ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-                // ElapsedTimeTextBlock.Text = elapsedTime;
-                MessageBox.Show(elapsedTime);
+                Thread.Sleep(1000);
+                // stopWatch.Stop();
+
+                TimeSpan etts = ElapsedTimeStopwatch.Elapsed;
+
+                string ElapsedTime = String.Format("{0:00}:{1:00}:{2:00}",
+                    etts.Hours, etts.Minutes, etts.Seconds);
+                MessageBox.Show(ElapsedTime);
             }
         }
 
