@@ -16,6 +16,7 @@ namespace BackupFolders
     public class FileCopyingClass
     {
         static string SourceFileName;
+        public static bool IsFileCopyingActive;
 
         // Colours
         static byte ErrorA = 255;
@@ -42,15 +43,20 @@ namespace BackupFolders
             ElapsedTimeStopwatch.Start();
             while (true)
             {
-                Thread.Sleep(1000);
                 // stopWatch.Stop();
 
                 TimeSpan etts = ElapsedTimeStopwatch.Elapsed;
 
                 string ElapsedTime = String.Format("{0:00}:{1:00}:{2:00}",
                     etts.Hours, etts.Minutes, etts.Seconds);
-                MessageBox.Show(ElapsedTime);
+
+                // MessageBox.Show(ElapsedTime);
             }
+        }
+
+        public static void UpdateElapsedTimeTextBlock(string ElapsedTimeText, TextBlock ElapsedTimeTextBlock)
+        {
+            ElapsedTimeTextBlock.Text = ElapsedTimeText;
         }
 
         public static void StartElapsedTime(TextBlock ElapsedTimeTextBlock)
@@ -62,7 +68,10 @@ namespace BackupFolders
         public static async void StartCopying(ListBox SelectedFilesListBox, ProgressBar ProgressBar, 
                                               TextBlock ProgressBarTextBlock, TextBlock ElapsedTimeTextBlock)
         {
+            IsFileCopyingActive = true;
             int FileCount = 0;
+
+            StartElapsedTime(ElapsedTimeTextBlock);
 
             // Add Warning - Files Will Be Overwritten!
 
@@ -156,6 +165,8 @@ namespace BackupFolders
                 FileCopyNotice(ProgressBar, ProgressBarTextBlock, NotSupportedExceptionError,
                                 ErrorA, ErrorR, ErrorG, ErrorB);
             }
+
+            IsFileCopyingActive = false;
         }
 
         public static async Task FileBackup(ProgressBar ProgressBar, TextBlock ProgressBarTextBlock, string SourceFileDir, string BackupDir)

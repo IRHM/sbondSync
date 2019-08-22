@@ -180,28 +180,34 @@ namespace BackupFolders
 
         private void BackupFilesButton_Click(object sender, RoutedEventArgs e)
         {
-            IsDefaultBackupDirAssigned();
+            if (FileCopyingClass.IsFileCopyingActive)
+            {
+                MessageBox.Show("Files Are Currently Being Copied. Please Wait.");
+            }
+            else
+            {
+                IsDefaultBackupDirAssigned();
 
-            if (BackupDirMessageBoxResponse == "Yes")
-            {
-                if(SelectedFilesListBox.Items.Count != 0)
+                if (BackupDirMessageBoxResponse == "Yes")
                 {
-                    ResetProgressBar();
-                    FileCopyingClass.StartCopying(SelectedFilesListBox, ProgressBar, ProgressBarTextBlock, ElapsedTimeTextBlock);
-                    FileCopyingClass.StartElapsedTime(ElapsedTimeTextBlock);
+                    if (SelectedFilesListBox.Items.Count != 0)
+                    {
+                        ResetProgressBar();
+                        FileCopyingClass.StartCopying(SelectedFilesListBox, ProgressBar, ProgressBarTextBlock, ElapsedTimeTextBlock);
+                    }
+                    else
+                    {
+                        FileCopyingClass.FileCopyNotice(ProgressBar, ProgressBarTextBlock, "No Files Selected", ErrorA, ErrorR, ErrorG, ErrorB);
+                    }
                 }
-                else
+                else if (BackupDirMessageBoxResponse == "Change Backup Dir")
                 {
-                    FileCopyingClass.FileCopyNotice(ProgressBar, ProgressBarTextBlock, "No Files Selected", ErrorA, ErrorR, ErrorG, ErrorB);
+                    SelectBackupDir();
                 }
-            }
-            else if (BackupDirMessageBoxResponse == "Change Backup Dir")
-            {
-                SelectBackupDir();
-            }
-            else if (BackupDirMessageBoxResponse == "Cancel")
-            {
-                FileCopyingClass.FileCopyNotice(ProgressBar, ProgressBarTextBlock, "Operation Cancelled", ErrorA, ErrorR, ErrorG, ErrorB);
+                else if (BackupDirMessageBoxResponse == "Cancel")
+                {
+                    FileCopyingClass.FileCopyNotice(ProgressBar, ProgressBarTextBlock, "Operation Cancelled", ErrorA, ErrorR, ErrorG, ErrorB);
+                }
             }
         }
     }
