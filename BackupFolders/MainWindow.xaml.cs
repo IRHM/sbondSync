@@ -210,5 +210,10 @@ namespace BackupFolders
                 }
             }
         }
+
+        private void CancelProcessButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

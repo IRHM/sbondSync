@@ -50,13 +50,16 @@ namespace BackupFolders
                 string ElapsedTime = String.Format("{0:00}:{1:00}:{2:00}",
                     etts.Hours, etts.Minutes, etts.Seconds);
 
-                // MessageBox.Show(ElapsedTime);
+                UpdateElapsedTimeTextBlock(ElapsedTime, ElapsedTimeTextBlock);
             }
         }
 
         public static void UpdateElapsedTimeTextBlock(string ElapsedTimeText, TextBlock ElapsedTimeTextBlock)
         {
-            ElapsedTimeTextBlock.Text = ElapsedTimeText;
+            ElapsedTimeTextBlock.Dispatcher.Invoke(() =>
+            {
+                ElapsedTimeTextBlock.Text = ElapsedTimeText;
+            });
         }
 
         public static void StartElapsedTime(TextBlock ElapsedTimeTextBlock)
