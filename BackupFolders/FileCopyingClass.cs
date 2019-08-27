@@ -37,18 +37,16 @@ namespace BackupFolders
         static string DirectoryNotFoundExceptionError = "Path Does Not Exist";
         static string NotSupportedExceptionError = "File Is In Invalid Format";
 
+        static Stopwatch ElapsedTimeStopwatch = new Stopwatch();
+
         public static void ElapsedTime(TextBlock ElapsedTimeTextBlock)
         {
-            Stopwatch ElapsedTimeStopwatch = new Stopwatch();
             ElapsedTimeStopwatch.Start();
-            while (true)
+            while (ElapsedTimeStopwatch.IsRunning)
             {
-                // stopWatch.Stop();
-
                 TimeSpan etts = ElapsedTimeStopwatch.Elapsed;
 
-                string ElapsedTime = String.Format("{0:00}:{1:00}:{2:00}",
-                    etts.Hours, etts.Minutes, etts.Seconds);
+                string ElapsedTime = etts.ToString(@"hh\:mm\:ss\:fff");
 
                 UpdateElapsedTimeTextBlock(ElapsedTime, ElapsedTimeTextBlock);
             }
@@ -169,6 +167,8 @@ namespace BackupFolders
                                 ErrorA, ErrorR, ErrorG, ErrorB);
             }
 
+            ElapsedTimeStopwatch.Stop();
+            ElapsedTimeStopwatch.Reset();
             IsFileCopyingActive = false;
         }
 

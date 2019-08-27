@@ -118,10 +118,11 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1.5*"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock x:Name="ElapsedTimeTextBlock"
+                           TextWrapping="Wrap"
                            Grid.Column="3"
                            FontWeight="Bold"
                            TextAlignment="Right"
