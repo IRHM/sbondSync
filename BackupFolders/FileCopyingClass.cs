@@ -46,9 +46,24 @@ namespace BackupFolders
             {
                 TimeSpan etts = ElapsedTimeStopwatch.Elapsed;
 
-                string ElapsedTime = etts.ToString(@"hh\:mm\:ss\:fff");
+                string format;
 
-                UpdateElapsedTimeTextBlock(ElapsedTime, ElapsedTimeTextBlock);
+                if (etts.TotalHours >= 1)
+                {
+                    format = @"hh\:mm\:ss\:fff";
+                }
+                else if (etts.TotalMinutes >= 1)
+                {
+                    format = @"mm\:ss\:fff";
+                }
+                else
+                {
+                    format = @"ss\:fff";
+                }
+
+                string ElapsedTime = etts.ToString(format);
+
+                UpdateElapsedTimeTextBlock($"Elapsed: {ElapsedTime}", ElapsedTimeTextBlock);
             }
         }
 
@@ -88,7 +103,7 @@ namespace BackupFolders
 
                     if (attr.HasFlag(FileAttributes.Directory))
                     {
-                        FileCount = Directory.GetFiles(s, "*", SearchOption.AllDirectories).Length; // FileCount = How many files in directories
+                        FileCount += Directory.GetFiles(s, "*", SearchOption.AllDirectories).Length; // FileCount = How many files in directories
                     }
                     else
                     {
