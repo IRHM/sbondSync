@@ -182,7 +182,7 @@ namespace BackupFolders
         {
             if (FileCopyingClass.IsFileCopyingActive)
             {
-                MessageBox.Show("Files Are Currently Being Copied. Please Wait.");
+                CustomMessageBox.Show("Files Are Currently Being Copied. Please Wait.");
             }
             else
             {
